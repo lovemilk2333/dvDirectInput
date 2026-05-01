@@ -2,7 +2,6 @@ using System;
 using UnityModManagerNet;
 using static DV.HUD.InteriorControlsManager;
 
-
 namespace dvDirectInput
 {
 	public static class Main
@@ -71,7 +70,6 @@ namespace dvDirectInput
 		// Render to game window
 		static void OnFixedGUI(UnityModManager.ModEntry modEntry)
 		{
-
 			if (settings.configEnableRecentInputGUI)
 				Input.RenderRecentInputs();
 		}
@@ -99,7 +97,5 @@ namespace dvDirectInput
 				return e.Message;
 			}
 		}
-
 	}
-
 }

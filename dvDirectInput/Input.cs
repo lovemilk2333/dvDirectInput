@@ -1,8 +1,8 @@
-using SharpDX.DirectInput;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using SharpDX.DirectInput;
 using UnityEngine;
 
 namespace dvDirectInput
@@ -39,7 +39,10 @@ namespace dvDirectInput
 
 			public override string ToString()
 			{
-				return string.Format(CultureInfo.InvariantCulture, $"ID: {JoystickObj.Properties}, Offset: {Offset}, Value: {Value}, Normalised Value {NormalisedValue()}, Timestamp {Timestamp}");
+				return string.Format(
+					CultureInfo.InvariantCulture,
+					$"ID: {JoystickObj.Properties}, Offset: {Offset}, Value: {Value}, Normalised Value {NormalisedValue()}, Timestamp {Timestamp}"
+				);
 			}
 		}
 
@@ -47,7 +50,10 @@ namespace dvDirectInput
 		public static void Initialise()
 		{
 			var directInput = new DirectInput();
-			var devices = directInput.GetDevices(DeviceClass.GameControl, DeviceEnumerationFlags.AllDevices);
+			var devices = directInput.GetDevices(
+				DeviceClass.GameControl,
+				DeviceEnumerationFlags.AllDevices
+			);
 			foreach (var device in devices)
 			{
 				var joystick = new Joystick(directInput, device.InstanceGuid);
@@ -76,11 +82,24 @@ namespace dvDirectInput
 			// Grab inputs for all controllers
 			foreach (var joystick in joysticks.Select((val, idx) => new { idx, val }))
 			{
-				try { joystick.val.Poll(); } catch { continue; }
+				try
+				{
+					joystick.val.Poll();
+				}
+				catch
+				{
+					continue;
+				}
 				foreach (var data in joystick.val.GetBufferedData())
 				{
 					// Chuck all the inputs on a queue
-					var input = new InputItem() { JoystickObj = joystick.val, Offset = data.Offset, Value = data.Value, Timestamp = data.Timestamp };
+					var input = new InputItem()
+					{
+						JoystickObj = joystick.val,
+						Offset = data.Offset,
+						Value = data.Value,
+						Timestamp = data.Timestamp,
+					};
 					inputQueue.Enqueue(input);
 
 					// GUI Logic - Copy of inputs
@@ -96,7 +115,10 @@ namespace dvDirectInput
 				{
 					if (joysticksRecentInputs[joystick.idx].Count > 0)
 					{
-						while (currentTimestamp - joysticksRecentInputs[joystick.idx].Peek().Timestamp > 1000)
+						while (
+							currentTimestamp - joysticksRecentInputs[joystick.idx].Peek().Timestamp
+							> 1000
+						)
 						{
 							joysticksRecentInputs[joystick.idx].Dequeue();
 							if (joysticksRecentInputs[joystick.idx].Count == 0)
@@ -124,9 +146,24 @@ namespace dvDirectInput
 				Main.mod.Logger.Log($"Joystick Properties for {prop.Name}");
 				if (joystick.GetType().GetProperty(prop.Name).GetValue(joystick) == null)
 					continue;
-				if (joystick.GetType().GetProperty(prop.Name).GetValue(joystick).GetType().GetProperties().Length > 0)
+				if (
+					joystick
+						.GetType()
+						.GetProperty(prop.Name)
+						.GetValue(joystick)
+						.GetType()
+						.GetProperties()
+						.Length > 0
+				)
 				{
-					foreach (var subprop in joystick.GetType().GetProperty(prop.Name).GetValue(joystick).GetType().GetProperties())
+					foreach (
+						var subprop in joystick
+							.GetType()
+							.GetProperty(prop.Name)
+							.GetValue(joystick)
+							.GetType()
+							.GetProperties()
+					)
 					{
 						string val = "";
 						try
@@ -142,9 +179,24 @@ namespace dvDirectInput
 				}
 				Main.mod.Logger.Log($"");
 				Main.mod.Logger.Log($"Joystick Fields for {prop.Name}");
-				if (joystick.GetType().GetProperty(prop.Name).GetValue(joystick).GetType().GetProperties().Length > 0)
+				if (
+					joystick
+						.GetType()
+						.GetProperty(prop.Name)
+						.GetValue(joystick)
+						.GetType()
+						.GetProperties()
+						.Length > 0
+				)
 				{
-					foreach (var field in joystick.GetType().GetProperty(prop.Name).GetValue(joystick).GetType().GetFields())
+					foreach (
+						var field in joystick
+							.GetType()
+							.GetProperty(prop.Name)
+							.GetValue(joystick)
+							.GetType()
+							.GetFields()
+					)
 					{
 						string val = "";
 						try
@@ -168,16 +220,30 @@ namespace dvDirectInput
 				Main.mod.Logger.Log($"Joystick Object Fields");
 				foreach (var field in obj.GetType().GetFields())
 				{
-					Main.mod.Logger.Log($"ID: {joystick.Properties.JoystickId}, Device: {joystick.Properties.ProductName}, {field.Name}: {field.GetValue(obj)}");
+					Main.mod.Logger.Log(
+						$"ID: {joystick.Properties.JoystickId}, Device: {joystick.Properties.ProductName}, {field.Name}: {field.GetValue(obj)}"
+					);
 				}
 
 				Main.mod.Logger.Log($"Joystick Object Properties");
-				Main.mod.Logger.Log($"Deadzone: {Main.Try<ObjectProperties>(() => joystick.GetObjectPropertiesById(obj.ObjectId).DeadZone.ToString())}");
-				Main.mod.Logger.Log($"Granularity: {Main.Try<ObjectProperties>(() => joystick.GetObjectPropertiesById(obj.ObjectId).Granularity.ToString())}");
-				Main.mod.Logger.Log($"LogicalRange: {Main.Try<ObjectProperties>(() => joystick.GetObjectPropertiesById(obj.ObjectId).LogicalRange.Minimum.ToString())}, {Main.Try<ObjectProperties>(() => joystick.GetObjectPropertiesById(obj.ObjectId).LogicalRange.Maximum.ToString())}");
-				Main.mod.Logger.Log($"PhysicalRange: {Main.Try<ObjectProperties>(() => joystick.GetObjectPropertiesById(obj.ObjectId).PhysicalRange.Minimum.ToString())}, {Main.Try<ObjectProperties>(() => joystick.GetObjectPropertiesById(obj.ObjectId).PhysicalRange.Maximum.ToString())}");
-				Main.mod.Logger.Log($"Range: {Main.Try<ObjectProperties>(() => joystick.GetObjectPropertiesById(obj.ObjectId).Range.Minimum.ToString())}, {Main.Try<ObjectProperties>(() => joystick.GetObjectPropertiesById(obj.ObjectId).Range.Maximum.ToString())}");
-				Main.mod.Logger.Log($"Saturation: {Main.Try<ObjectProperties>(() => joystick.GetObjectPropertiesById(obj.ObjectId).Saturation.ToString())}");
+				Main.mod.Logger.Log(
+					$"Deadzone: {Main.Try<ObjectProperties>(() => joystick.GetObjectPropertiesById(obj.ObjectId).DeadZone.ToString())}"
+				);
+				Main.mod.Logger.Log(
+					$"Granularity: {Main.Try<ObjectProperties>(() => joystick.GetObjectPropertiesById(obj.ObjectId).Granularity.ToString())}"
+				);
+				Main.mod.Logger.Log(
+					$"LogicalRange: {Main.Try<ObjectProperties>(() => joystick.GetObjectPropertiesById(obj.ObjectId).LogicalRange.Minimum.ToString())}, {Main.Try<ObjectProperties>(() => joystick.GetObjectPropertiesById(obj.ObjectId).LogicalRange.Maximum.ToString())}"
+				);
+				Main.mod.Logger.Log(
+					$"PhysicalRange: {Main.Try<ObjectProperties>(() => joystick.GetObjectPropertiesById(obj.ObjectId).PhysicalRange.Minimum.ToString())}, {Main.Try<ObjectProperties>(() => joystick.GetObjectPropertiesById(obj.ObjectId).PhysicalRange.Maximum.ToString())}"
+				);
+				Main.mod.Logger.Log(
+					$"Range: {Main.Try<ObjectProperties>(() => joystick.GetObjectPropertiesById(obj.ObjectId).Range.Minimum.ToString())}, {Main.Try<ObjectProperties>(() => joystick.GetObjectPropertiesById(obj.ObjectId).Range.Maximum.ToString())}"
+				);
+				Main.mod.Logger.Log(
+					$"Saturation: {Main.Try<ObjectProperties>(() => joystick.GetObjectPropertiesById(obj.ObjectId).Saturation.ToString())}"
+				);
 			}
 			Main.mod.Logger.Log($"");
 		}
@@ -189,12 +255,17 @@ namespace dvDirectInput
 			foreach (var joystick in joysticks.Select((val, idx) => new { idx, val }))
 			{
 				// Gets unique sorted input names from the recent input list
-				var offsetList = new SortedSet<JoystickOffset>(joysticksRecentInputs[joystick.idx].Select(val => val.Offset).ToList().Distinct());
+				var offsetList = new SortedSet<JoystickOffset>(
+					joysticksRecentInputs[joystick.idx]
+						.Select(val => val.Offset)
+						.ToList()
+						.Distinct()
+				);
 				// Just do a bunch of GUI stuff
 				var style = new GUIStyle
 				{
 					alignment = TextAnchor.MiddleLeft,
-					stretchWidth = false
+					stretchWidth = false,
 				};
 				style.normal.textColor = Color.white;
 				style.normal.background = Texture2D.grayTexture;
@@ -218,6 +289,5 @@ namespace dvDirectInput
 				GUILayout.EndHorizontal();
 			}
 		}
-
 	}
 }

@@ -61,6 +61,7 @@ sudo pacman -S dotnet-host dotnet-runtime dotnet-targeting-pack
 2. provide the gamepath
     1. copy `dvDirectInput/dvDirectInput.csproj.template` to `dvDirectInput/dvDirectInput.csproj`
     2. edit ``$${GMAE_PATH}$$`` to be your gamepath, like `/path/to/Derail-Valley`, which includes `DerailValley_Data` subfolder
+    3. edit `<Version>0.6.0</Version>` to latest version (see [releases/latest](../../releases/latest))
 
 3. run build
 ```sh
