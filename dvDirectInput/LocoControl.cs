@@ -1,5 +1,6 @@
 using DV.HUD;
 using System.Linq;
+using UnityEngine;
 using static DV.HUD.InteriorControlsManager;
 
 namespace dvDirectInput
@@ -29,7 +30,20 @@ namespace dvDirectInput
 					{
 						var control = new ControlReference();
 						if (!PlayerManager.Car?.interior.GetComponentInChildren<InteriorControlsManager>().TryGetControl((ControlType)configControl.idx, out control) ?? true) return;
-						control.controlImplBase?.SetValue(configControl.val.InvertControl ? 1.0f - input.NormalisedValue() : input.NormalisedValue());
+						float value = input.NormalisedValue();
+
+						float min = configControl.val.InputRangeMin;
+						float max = configControl.val.InputRangeMax;
+						if (value <= min) value = 0f;
+						else if (value >= max) value = 1f;
+						else value = (value - min) / (max - min);
+
+						value *= configControl.val.Rate;
+						Mathf.Clamp(value, 0f, 1f);
+						
+						if (configControl.val.InvertControl)
+							value = 1.0f - value;
+						control.controlImplBase?.SetValue(value);
 						break;
 					}
 				}

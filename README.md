@@ -51,6 +51,26 @@ The next time you jump in a locomotive, try out your new control interface.
 
 This is a complete overhaul of the original [AnalogueLocoControlMod](https://github.com/Matthew-J-Green/dv-loco-analogue-control-mod).
 
+# Compile
+for ArchLinux based OS:
+1. install dotnet
+```sh
+sudo pacman -S dotnet-host dotnet-runtime dotnet-targeting-pack
+```
+
+2. provide the gamepath
+    1. copy `dvDirectInput/dvDirectInput.csproj.template` to `dvDirectInput/dvDirectInput.csproj`
+    2. edit ``$${GMAE_PATH}$$`` to be your gamepath, like `/path/to/Derail-Valley`, which includes `DerailValley_Data` subfolder
+
+3. run build
+```sh
+dotnet restore
+dotnet build
+```
+
+4. output at `build/`  
+just copy all dlls to `$${GAMEPATH}$$/Mods/dvDirectInput/` to apply
+
 ## Design
 
 There are a few ways to go about getting input devices into Derail Valley.
@@ -86,4 +106,4 @@ The author of this mod is not really a developer. You might have better ways of 
 
 ## License
 
-Source code is distributed under the MIT license. See [LICENSE](LICENSE) for more information.
+Source code is distributed under the BSD 3-Clause license. See [LICENSE](LICENSE) for more information.
